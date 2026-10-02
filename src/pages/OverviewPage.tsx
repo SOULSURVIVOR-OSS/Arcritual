@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   Heading,
   Text,
@@ -14,14 +14,8 @@ import {
   Calendar as CalendarIcon,
   Plus,
 } from 'lucide-react';
-
-interface HabitItem {
-  id: string;
-  name: string;
-  time?: string;
-  streak?: number;
-  completed: boolean;
-}
+import { useHabits } from '../context/HabitsContext';
+import { useRoadmaps } from '../context/RoadmapsContext';
 
 interface CalendarEvent {
   id: string;
@@ -35,55 +29,13 @@ interface OverviewPageProps {
 }
 
 export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
-  // Today's interactive habit checklist
-  const [habits, setHabits] = useState<HabitItem[]>([
-    {
-      id: 'h1',
-      name: 'Morning Cognitive Horizon & Planning',
-      time: '07:30',
-      streak: 24,
-      completed: true,
-    },
-    {
-      id: 'h2',
-      name: '90m Deep Work Block — Core Architecture',
-      time: '09:00',
-      streak: 18,
-      completed: true,
-    },
-    {
-      id: 'h3',
-      name: 'Hydration & Electrolyte Baseline (1.0L)',
-      streak: 42,
-      completed: true,
-    },
-    {
-      id: 'h4',
-      name: 'Zone 2 Aerobic Conditioning',
-      time: '16:30',
-      streak: 9,
-      completed: false,
-    },
-    {
-      id: 'h5',
-      name: 'Evening Synthesis & Daily Retrospective',
-      time: '20:45',
-      streak: 31,
-      completed: false,
-    },
-    {
-      id: 'h6',
-      name: 'Zero Ambient Screen Consumption after 21:00',
-      streak: 6,
-      completed: false,
-    },
-  ]);
+  const { habits, toggleCompleteHabit, getHabitStreak } = useHabits();
+  const { activeRoadmap, getRoadmapProgress } = useRoadmaps();
 
-  const toggleHabit = (id: string) => {
-    setHabits((prev) =>
-      prev.map((h) => (h.id === id ? { ...h, completed: !h.completed } : h))
-    );
-  };
+  const todayKey = useMemo(() => new Date().toISOString().split('T')[0], []);
+
+  // Filter to active habits
+  const activeHabits = useMemo(() => habits.filter((h) => !h.isPaused), [habits]);
 
   // Dynamic time-based greeting
   const greeting = useMemo(() => {
@@ -102,8 +54,14 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
     }).format(new Date());
   }, []);
 
-  const completedCount = habits.filter((h) => h.completed).length;
-  const progressPercent = Math.round((completedCount / habits.length) * 100);
+  const completedCount = activeHabits.filter((h) => Boolean(h.history[todayKey])).length;
+  const progressPercent = activeHabits.length > 0 ? Math.round((completedCount / activeHabits.length) * 100) : 0;
+
+  // Active roadmap analytics
+  const roadmapProgress = activeRoadmap ? getRoadmapProgress(activeRoadmap) : null;
+  const nextTask = activeRoadmap?.phases
+    .flatMap((p) => p.tasks)
+    .find((t) => !t.completed);
 
   // Next relevant events from Google Calendar
   const upcomingEvents: CalendarEvent[] = [
@@ -148,7 +106,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
             <span className="text-secondary font-medium">Today's Progress</span>
             <span className="font-mono tabular-nums text-tertiary">
               <span className="text-primary font-semibold">{completedCount}</span> of{' '}
-              {habits.length} completed · <span className="text-accent font-semibold">{progressPercent}%</span>
+              {activeHabits.length} completed · <span className="text-accent font-semibold">{progressPercent}%</span>
             </span>
           </div>
           <div className="h-1.5 w-full bg-surface-subtle rounded-full overflow-hidden border border-subtle">
@@ -182,57 +140,62 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
         </div>
 
         <div className="divide-y divide-subtle">
-          {habits.map((habit) => (
-            <div
-              key={habit.id}
-              onClick={() => toggleHabit(habit.id)}
-              className="py-3.5 flex items-center justify-between gap-4 group cursor-pointer hover:bg-surface-elevated/30 px-2 -mx-2 rounded-[6px] transition-colors"
-            >
-              {/* Left: Checkbox + Name */}
-              <div className="flex items-center gap-3.5 min-w-0">
-                <button
-                  type="button"
-                  role="checkbox"
-                  aria-checked={habit.completed}
-                  aria-label={habit.name}
-                  className={`
-                    w-4 h-4 rounded-[4px] border flex items-center justify-center transition-colors shrink-0
-                    ${
-                      habit.completed
-                        ? 'bg-accent border-accent text-accent-foreground'
-                        : 'border-subtle bg-surface-subtle group-hover:border-strong'
-                    }
-                  `}
-                >
-                  {habit.completed && <Check className="w-3 h-3 stroke-[2.5]" />}
-                </button>
+          {activeHabits.map((habit) => {
+            const isCompleted = Boolean(habit.history[todayKey]);
+            const streak = getHabitStreak(habit).current;
 
-                <span
-                  className={`text-sm transition-colors truncate ${
-                    habit.completed
-                      ? 'text-tertiary line-through select-none'
-                      : 'text-primary font-normal'
-                  }`}
-                >
-                  {habit.name}
-                </span>
-              </div>
+            return (
+              <div
+                key={habit.id}
+                onClick={() => toggleCompleteHabit(habit.id)}
+                className="py-3.5 flex items-center justify-between gap-4 group cursor-pointer hover:bg-surface-elevated/30 px-2 -mx-2 rounded-[6px] transition-colors"
+              >
+                {/* Left: Checkbox + Name */}
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <button
+                    type="button"
+                    role="checkbox"
+                    aria-checked={isCompleted}
+                    aria-label={habit.name}
+                    className={`
+                      w-4 h-4 rounded-[4px] border flex items-center justify-center transition-colors shrink-0
+                      ${
+                        isCompleted
+                          ? 'bg-accent border-accent text-accent-foreground'
+                          : 'border-subtle bg-surface-subtle group-hover:border-strong'
+                      }
+                    `}
+                  >
+                    {isCompleted && <Check className="w-3 h-3 stroke-[2.5]" />}
+                  </button>
 
-              {/* Right: Scheduled Time & Optional Streak */}
-              <div className="flex items-center gap-4 shrink-0 text-xs font-mono tabular-nums">
-                {habit.time && (
-                  <span className="text-secondary">
-                    {habit.time}
+                  <span
+                    className={`text-sm transition-colors truncate ${
+                      isCompleted
+                        ? 'text-tertiary line-through select-none'
+                        : 'text-primary font-normal'
+                    }`}
+                  >
+                    {habit.name}
                   </span>
-                )}
-                {habit.streak !== undefined && (
-                  <span className="text-tertiary">
-                    {habit.streak}d streak
-                  </span>
-                )}
+                </div>
+
+                {/* Right: Scheduled Time & Optional Streak */}
+                <div className="flex items-center gap-4 shrink-0 text-xs font-mono tabular-nums">
+                  {habit.preferredTime && (
+                    <span className="text-secondary">
+                      {habit.preferredTime}
+                    </span>
+                  )}
+                  {streak > 0 && (
+                    <span className="text-tertiary">
+                      {streak}d streak
+                    </span>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -258,45 +221,51 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
         </div>
 
         {/* Roadmap Display (Single surface, restrained, spacious) */}
-        <div className="p-5 rounded-[8px] bg-surface border border-subtle space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
-            <h3 className="text-sm font-semibold text-primary">
-              Arcritual OS Core Architecture & Protocol
-            </h3>
-            <span className="text-xs font-mono tabular-nums text-tertiary">
-              Q4 2026 Horizon
-            </span>
-          </div>
-
-          {/* Simple progress indicator */}
-          <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-secondary">Overall Completion</span>
-              <span className="font-mono tabular-nums font-semibold text-accent">
-                82%
+        {activeRoadmap && roadmapProgress ? (
+          <div className="p-5 rounded-[8px] bg-surface border border-subtle space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+              <h3 className="text-sm font-semibold text-primary">
+                {activeRoadmap.title}
+              </h3>
+              <span className="text-xs font-mono tabular-nums text-tertiary">
+                {activeRoadmap.phases.length} Phases Active
               </span>
             </div>
-            <div className="h-1.5 w-full bg-surface-subtle rounded-full overflow-hidden border border-subtle">
-              <div
-                className="h-full bg-accent transition-all duration-300 ease-out rounded-full"
-                style={{ width: '82%' }}
-              />
-            </div>
-          </div>
 
-          {/* Next milestone & deliverables */}
-          <div className="pt-2 border-t border-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-            <div className="flex items-center gap-2">
-              <span className="text-tertiary">Next milestone:</span>
-              <span className="font-medium text-primary">
-                Telemetry synchronization & persistence layer
+            {/* Simple progress indicator */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-secondary">Overall Completion</span>
+                <span className="font-mono tabular-nums font-semibold text-accent">
+                  {roadmapProgress.percentage}%
+                </span>
+              </div>
+              <div className="h-1.5 w-full bg-surface-subtle rounded-full overflow-hidden border border-subtle">
+                <div
+                  className="h-full bg-accent transition-all duration-300 ease-out rounded-full"
+                  style={{ width: `${roadmapProgress.percentage}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Next milestone & deliverables */}
+            <div className="pt-2 border-t border-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-2 truncate">
+                <span className="text-tertiary shrink-0">Next milestone:</span>
+                <span className="font-medium text-primary truncate">
+                  {nextTask ? nextTask.title : 'All roadmap milestones completed'}
+                </span>
+              </div>
+              <span className="font-mono tabular-nums text-tertiary shrink-0">
+                {nextTask?.deadline || `${roadmapProgress.completedTasks}/${roadmapProgress.totalTasks} shipped`}
               </span>
             </div>
-            <span className="font-mono tabular-nums text-tertiary shrink-0">
-              Due Oct 9
-            </span>
           </div>
-        </div>
+        ) : (
+          <div className="p-5 rounded-[8px] bg-surface border border-subtle text-center text-xs text-secondary">
+            No active roadmaps. Convert a learning plan from ChatGPT to get started.
+          </div>
+        )}
       </section>
 
       {/* ========================================================================= */}

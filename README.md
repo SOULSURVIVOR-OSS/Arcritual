@@ -105,6 +105,24 @@ The Overview dashboard answers four core questions with intentional sparsity:
 
 ---
 
+## ⚡ Habit Tracking Engine (Layer 4)
+
+- **Disciplined Lifecycle**: Create, edit, pause, and delete habits with strict anti-gamification (no coins, XP, or badges).
+- **Frequency & Timing**: Daily, weekly, or specific days (Mon–Sun), preferred time (e.g. `07:30`), and target goals (e.g. `90m session`).
+- **Compact Weekly View**: 7-day Monday–Sunday matrix directly on each habit row with interactive completion toggles.
+- **30-Day Matrix**: Monastic consistency matrix detailing verified daily completion ratios and streak tracking.
+
+---
+
+## 🗺 Natural Language AI Roadmap Converter (Layer 5)
+
+- **AI Parsing Engine**: Paste unstructured learning syllabi or outlines from ChatGPT/Claude (`Week 1:`, `Phase 1:`, bullet lists).
+- **Structured Horizons**: Automatically generates milestones, phases, tasks, and deadlines.
+- **Personal Scope**: In-line task reordering, inline task addition, phase editing, and real-time progress visualization without Jira overhead.
+- **Local Persistence**: State synchronized automatically with `localStorage` and the central Command Overview.
+
+---
+
 ## 🚀 Getting Started
 
 ### Installation
