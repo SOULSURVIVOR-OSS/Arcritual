@@ -89,6 +89,22 @@ Arcritual/
 
 ---
 
+## 🎯 Command Center Overview (Layer 3)
+
+The Overview dashboard answers four core questions with intentional sparsity:
+
+1. **What do I need to do today? & How are my habits going?**
+   - **Section 01 — Today**: Clean checklist of daily habits with scheduled times, interactive checkboxes, strikethrough completion states, and streak counters.
+   - Dynamic top greeting and real-time visual progress bar (`completed of total · % daily focus`).
+2. **What am I currently working toward?**
+   - **Section 02 — Active Roadmap**: Displays active horizon name (`Arcritual OS Core Architecture & Protocol`), tabular progress percentage (`82%`), accent progress indicator, and next milestone target.
+3. **How active have I been?**
+   - **Section 03 — Activity**: Minimalist connected services summary (`Strava Synced`): Distance this week (`34.8 km`), logged workouts (`4 sessions`), active days (`5 of 7 days`).
+4. **What is scheduled next?**
+   - **Section 04 — Upcoming Events**: Next relevant Google Calendar appointments in clean tabular time rows without a cluttered grid.
+
+---
+
 ## 🚀 Getting Started
 
 ### Installation
