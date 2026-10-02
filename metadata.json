@@ -1,0 +1,6 @@
+{
+  "name": "Kanso — Focus & Self-Improvement",
+  "description": "A calm, premium, and intentional personal productivity and self-improvement design system and workspace.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

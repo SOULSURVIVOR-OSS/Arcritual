@@ -1,0 +1,165 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+    /* Light Theme (Off-white / calm warm neutrals) */
+    --canvas: #f8f8f9;
+    --surface: #ffffff;
+    --surface-elevated: #f2f3f5;
+    --surface-subtle: #eaebee;
+    --border-subtle: #e2e4e8;
+    --border-strong: #cacdd4;
+    --text-primary: #121316;
+    --text-secondary: #585a64;
+    --text-tertiary: #8b8e99;
+
+    --accent: #d97706;
+    --accent-hover: #b45309;
+    --accent-subtle: rgba(217, 119, 6, 0.09);
+    --accent-foreground: #ffffff;
+
+    --status-success: #15803d;
+    --status-success-subtle: rgba(21, 128, 61, 0.08);
+    --status-warning: #b45309;
+    --status-warning-subtle: rgba(180, 83, 9, 0.08);
+    --status-danger: #b91c1c;
+    --status-danger-subtle: rgba(185, 28, 28, 0.08);
+
+    --radius-sm: 4px;
+    --radius-md: 7px;
+    --radius-lg: 10px;
+  }
+
+  .dark {
+    /* Dark Theme (Primary direction - deep, warm obsidian neutral) */
+    --canvas: #0c0d0f;
+    --surface: #141518;
+    --surface-elevated: #1a1c20;
+    --surface-subtle: #17181c;
+    --border-subtle: #22242a;
+    --border-strong: #323640;
+    --text-primary: #ededf0;
+    --text-secondary: #9698a2;
+    --text-tertiary: #5d606b;
+
+    --accent: #e5a93c;
+    --accent-hover: #f3b94f;
+    --accent-subtle: rgba(229, 169, 60, 0.12);
+    --accent-foreground: #0c0d0f;
+
+    --status-success: #34d399;
+    --status-success-subtle: rgba(52, 211, 153, 0.12);
+    --status-warning: #fbbf24;
+    --status-warning-subtle: rgba(251, 191, 36, 0.12);
+    --status-danger: #f87171;
+    --status-danger-subtle: rgba(248, 113, 113, 0.12);
+  }
+
+  /* Optional alternative accent palettes while maintaining strict ONE accent rule */
+  [data-accent="emerald"] {
+    --accent: #10b981;
+    --accent-hover: #059669;
+    --accent-subtle: rgba(16, 185, 129, 0.12);
+    --accent-foreground: #ffffff;
+  }
+  .dark[data-accent="emerald"] {
+    --accent: #34d399;
+    --accent-hover: #6ee7b7;
+    --accent-subtle: rgba(52, 211, 153, 0.14);
+    --accent-foreground: #0c0d0f;
+  }
+
+  [data-accent="cobalt"] {
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --accent-subtle: rgba(37, 99, 235, 0.1);
+    --accent-foreground: #ffffff;
+  }
+  .dark[data-accent="cobalt"] {
+    --accent: #38bdf8;
+    --accent-hover: #7dd3fc;
+    --accent-subtle: rgba(56, 189, 248, 0.14);
+    --accent-foreground: #0c0d0f;
+  }
+
+  [data-accent="monochrome"] {
+    --accent: #121316;
+    --accent-hover: #27272a;
+    --accent-subtle: rgba(0, 0, 0, 0.08);
+    --accent-foreground: #ffffff;
+  }
+  .dark[data-accent="monochrome"] {
+    --accent: #ededf0;
+    --accent-hover: #ffffff;
+    --accent-subtle: rgba(255, 255, 255, 0.12);
+    --accent-foreground: #0c0d0f;
+  }
+
+  * {
+    border-color: var(--border-subtle);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--canvas);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Optical compensation for dark mode text */
+  .dark body {
+    letter-spacing: 0.005em;
+  }
+
+  /* Custom utility classes referencing the design tokens */
+  .bg-canvas { background-color: var(--canvas); }
+  .bg-surface { background-color: var(--surface); }
+  .bg-surface-elevated { background-color: var(--surface-elevated); }
+  .bg-surface-subtle { background-color: var(--surface-subtle); }
+  .bg-accent { background-color: var(--accent); }
+  .bg-accent-subtle { background-color: var(--accent-subtle); }
+
+  .text-primary { color: var(--text-primary); }
+  .text-secondary { color: var(--text-secondary); }
+  .text-tertiary { color: var(--text-tertiary); }
+  .text-accent { color: var(--accent); }
+  .text-accent-foreground { color: var(--accent-foreground); }
+
+  .border-subtle { border-color: var(--border-subtle); }
+  .border-strong { border-color: var(--border-strong); }
+  .border-accent { border-color: var(--accent); }
+
+  /* Tabular numbers for all metrics, time, and data */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Clean focus ring */
+  .focus-ring {
+    outline: none;
+  }
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Custom scrollbar matching calm aesthetic */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+  }
+}
