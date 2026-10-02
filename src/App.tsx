@@ -2,6 +2,7 @@ import React from 'react';
 import { ThemeProvider } from './design-system';
 import { HabitsProvider } from './context/HabitsContext';
 import { RoadmapsProvider } from './context/RoadmapsContext';
+import { IntegrationsProvider } from './context/IntegrationsContext';
 import { AppShell } from './components/AppShell';
 
 export default function App() {
@@ -9,7 +10,9 @@ export default function App() {
     <ThemeProvider>
       <HabitsProvider>
         <RoadmapsProvider>
-          <AppShell />
+          <IntegrationsProvider>
+            <AppShell />
+          </IntegrationsProvider>
         </RoadmapsProvider>
       </HabitsProvider>
     </ThemeProvider>

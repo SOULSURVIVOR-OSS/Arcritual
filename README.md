@@ -123,6 +123,18 @@ The Overview dashboard answers four core questions with intentional sparsity:
 
 ---
 
+## 🏃 Strava & Extensible Integrations System (Layer 6)
+
+- **Reusable Integrations Model**: Modular service connector interface (`IntegrationServiceConfig`) pre-architected for Strava, Google Calendar, Whoop, and GitHub.
+- **Strava OAuth Flow**:
+  - Unconnected state: Explains value proposition and provides instant `"Connect Strava"` trigger with OAuth 2.0 PKCE support and developer configuration view.
+  - Connected state: Displays `"Connected to Strava"` with athlete identity and live sync verification.
+  - Telemetry: Surfaces running distance, cycling distance, weekly workouts, and 7-day activity timeline without statistical overload.
+  - Disconnect control: Allows instant unlinking anytime.
+- **Command Overview Sync**: Live sync with Section 3 (`Activity`) on the Overview command center.
+
+---
+
 ## 🚀 Getting Started
 
 ### Installation

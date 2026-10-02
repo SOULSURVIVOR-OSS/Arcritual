@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useHabits } from '../context/HabitsContext';
 import { useRoadmaps } from '../context/RoadmapsContext';
+import { useIntegrations } from '../context/IntegrationsContext';
 
 interface CalendarEvent {
   id: string;
@@ -31,6 +32,10 @@ interface OverviewPageProps {
 export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
   const { habits, toggleCompleteHabit, getHabitStreak } = useHabits();
   const { activeRoadmap, getRoadmapProgress } = useRoadmaps();
+  const { isProviderConnected, getStravaData } = useIntegrations();
+
+  const isStravaConnected = isProviderConnected('strava');
+  const stravaData = getStravaData();
 
   const todayKey = useMemo(() => new Date().toISOString().split('T')[0], []);
 
@@ -269,7 +274,7 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
       </section>
 
       {/* ========================================================================= */}
-      {/* SECTION 3 — ACTIVITY (How active have I been? e.g. Strava summary) */}
+      {/* SECTION 3 — ACTIVITY (How active have I been? Strava summary) */}
       {/* ========================================================================= */}
       <section className="space-y-4">
         <div className="flex items-baseline justify-between border-b border-subtle pb-2">
@@ -281,53 +286,75 @@ export const OverviewPage: React.FC<OverviewPageProps> = ({ onNavigate }) => {
               Activity
             </h2>
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-tertiary">
+          <button
+            onClick={() => onNavigate('activity')}
+            className="flex items-center gap-1.5 text-xs text-tertiary hover:text-primary transition-colors cursor-pointer"
+          >
             <ActivityIcon className="w-3.5 h-3.5 text-secondary" />
-            <span>Strava Synced</span>
-          </div>
+            <span>{isStravaConnected ? 'Strava Synced' : 'Connect Strava'}</span>
+          </button>
         </div>
 
-        {/* Minimal Activity Summary with generous whitespace, not crammed */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 py-2">
-          <div className="space-y-1">
-            <span className="text-xs text-tertiary block">Distance this week</span>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl font-semibold tracking-tight text-primary font-mono tabular-nums">
-                34.8
+        {isStravaConnected && stravaData ? (
+          /* Minimal Activity Summary with generous whitespace, not crammed */
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 py-2">
+            <div className="space-y-1">
+              <span className="text-xs text-tertiary block">Distance this week</span>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-2xl font-semibold tracking-tight text-primary font-mono tabular-nums">
+                  {(stravaData.runningDistanceKm + stravaData.cyclingDistanceKm).toFixed(1)}
+                </span>
+                <span className="text-xs text-tertiary">km</span>
+              </div>
+              <span className="text-[11px] text-secondary block">
+                {stravaData.runningDistanceKm}k run · {stravaData.cyclingDistanceKm}k ride
               </span>
-              <span className="text-xs text-tertiary">km</span>
             </div>
-            <span className="text-[11px] text-secondary block">
-              +6.2 km vs last week
-            </span>
-          </div>
 
-          <div className="space-y-1">
-            <span className="text-xs text-tertiary block">Workouts logged</span>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl font-semibold tracking-tight text-primary font-mono tabular-nums">
-                4
+            <div className="space-y-1">
+              <span className="text-xs text-tertiary block">Workouts logged</span>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-2xl font-semibold tracking-tight text-primary font-mono tabular-nums">
+                  {stravaData.workoutCount}
+                </span>
+                <span className="text-xs text-tertiary">sessions</span>
+              </div>
+              <span className="text-[11px] text-secondary block">
+                {stravaData.recentActivities[0]?.title.split(' ')[0]} latest
               </span>
-              <span className="text-xs text-tertiary">sessions</span>
             </div>
-            <span className="text-[11px] text-secondary block">
-              Avg 52m per session
-            </span>
-          </div>
 
-          <div className="space-y-1">
-            <span className="text-xs text-tertiary block">Active days</span>
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl font-semibold tracking-tight text-primary font-mono tabular-nums">
-                5
+            <div className="space-y-1">
+              <span className="text-xs text-tertiary block">Active days</span>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-2xl font-semibold tracking-tight text-primary font-mono tabular-nums">
+                  5
+                </span>
+                <span className="text-xs text-tertiary">of 7 days</span>
+              </div>
+              <span className="text-[11px] text-secondary block">
+                Aerobic threshold nominal
               </span>
-              <span className="text-xs text-tertiary">of 7 days</span>
             </div>
-            <span className="text-[11px] text-secondary block">
-              Aerobic threshold nominal
-            </span>
           </div>
-        </div>
+        ) : (
+          <div className="p-4 rounded-[6px] bg-surface border border-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="space-y-0.5">
+              <span className="font-medium text-primary block">
+                Strava Telemetry Disconnected
+              </span>
+              <p className="text-secondary">
+                Connect Strava to automatically bring your workouts into your daily progress.
+              </p>
+            </div>
+            <button
+              onClick={() => onNavigate('activity')}
+              className="text-accent hover:underline font-medium shrink-0 cursor-pointer text-left"
+            >
+              Connect Strava →
+            </button>
+          </div>
+        )}
       </section>
 
       {/* ========================================================================= */}
